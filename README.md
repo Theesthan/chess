@@ -1,173 +1,91 @@
-Multiplayer Chess with Spectator Evaluation Bar
-This project is a Python-based multiplayer chess game with a rich graphical interface using Tkinter. The game supports two roles:
+# Multiplayer Chess with Spectator Evaluation Bar
 
-Players: Can join as White or Black, make moves, and use features like resigning or offering a draw.
+**Multiplayer Chess** is a Python-based chess application that supports real-time gameplay between two players and allows spectators to watch the game with a live evaluation bar powered by Stockfish.
 
-Spectators: Can watch the game live with an evaluation bar powered by Stockfish showing the current board's analysis.
+---
 
-Table of Contents
-Overview
+## Table of Contents
 
-Features
+- [Overview](#overview)
+- [Features](#features)
+- [Design and Architecture](#design-and-architecture)
+- [Installation](#installation)
+- [Usage](#usage)
+- [Future Improvements](#future-improvements)
+- [License](#license)
 
-Design and Architecture
+---
 
-Installation
+## Overview
 
-Usage
+This project implements a multiplayer chess game with two main roles:
 
-Future Improvements
+- **Players:** Join as either White or Black, make moves, and use additional controls like resigning or offering a draw.
+- **Spectators:** Watch the game live with a full board view and an evaluation bar that shows Stockfish's analysis of the current position.
 
-License
+The application uses **Tkinter** for the GUI, **python-chess** for chess logic, and **Pillow** for image handling.
 
-Overview
-This project implements a multiplayer chess game with both player and spectator modes. The clients communicate with a central server via TCP sockets. The application supports the following functionalities:
+---
 
-Players choose a role (White or Black) and can make legal moves.
+## Features
 
-Spectators view the board in standard (White's) orientation and receive real-time updates.
+- **Real-Time Multiplayer:**  
+  Supports two players and multiple spectators via TCP socket communication.
 
-A timer is maintained for both players (10 minutes each) and is updated in MM:SS format.
+- **Chess Rules Enforcement:**  
+  Utilizes the `python-chess` library to manage legal moves and board state.
 
-Players can resign or offer a draw, with corresponding actions on the server.
+- **Time Control:**  
+  Both players have a **10-minute clock** displayed in **MM:SS** format.
 
-Spectators benefit from an evaluation bar powered by Stockfish, which analyzes the board position and displays a graphical representation (green for White advantage, red for Black advantage).
+- **Resign and Draw Options:**  
+  Players can **resign** or **offer a draw** via GUI buttons.
 
-Features
-Real-Time Multiplayer: Supports two players and multiple spectators.
+- **Spectator Evaluation Bar:**  
+  Spectators see a live evaluation bar (green for White advantage, red for Black advantage) updated using Stockfish analysis.
 
-Chess Rules Compliance: Uses the python-chess library to enforce legal moves.
+---
 
-Time Control: Both players have a 10-minute clock displayed in MM:SS format.
+## Design and Architecture
 
-Resign & Draw Options: Players can resign or offer a draw via GUI buttons.
+### GUI Design
 
-Full-Screen Toggle: Easily switch between windowed and full-screen mode.
+- **Chessboard:**  
+  An 8x8 grid of buttons displays the chess pieces using PNG images (e.g., `wP.png`, `bK.png`).  
+  - **Players:** Board orientation adapts to player color (White or Black).  
+  - **Spectators:** Always see the board in standard (White’s) orientation.
 
-Spectator Evaluation Bar: Spectators see a live evaluation bar calculated by Stockfish.
+- **Timer and Controls:**  
+  A timer shows each player's remaining time. Additional buttons allow players to **resign**, **offer a draw**, and toggle **full-screen mode**.
 
-Cross-Platform: Built using Python, Tkinter, and standard libraries.
+- **Evaluation Bar:**  
+  Spectators see a vertical evaluation bar on the left, which updates every second using Stockfish to analyze the current board.
 
-Design and Architecture
-GUI Design
-Tkinter Interface: The user interface is built with Tkinter. The main window displays:
+### Network Architecture
 
-The chessboard (an 8x8 grid of buttons). In player mode, the board is oriented based on the player’s color; spectators always see the board in White's orientation.
+- **Server-Client Communication:**  
+  The server listens for TCP connections, assigns roles, maintains the game state, and broadcasts updates (FEN strings, timer updates, game messages) to all clients.
 
-A timer label at the bottom shows the remaining time for both players.
+- **Threading:**  
+  The server runs separate threads for handling clients and for timer updates. The client also runs a background thread for network communication.
 
-Control buttons allow players to resign, offer a draw, or toggle full-screen mode.
+### Stockfish Integration
 
-In spectator mode, an evaluation bar appears on the left side of the board. This bar updates every second with Stockfish’s analysis.
+- **Engine Integration:**  
+  Spectator clients launch Stockfish via the `python-chess.engine` module to evaluate the board position and display a graphical evaluation bar.
 
-Network Architecture
-Server-Client Communication:
+---
 
-The server listens for incoming TCP connections.
+## Installation
 
-Upon connection, clients send their username and choose a role (player or spectator).
+### Prerequisites
 
-The server assigns roles (White/Black) to players and maintains the board state.
+- **Python 3.x**
+- **Pip**
 
-The server broadcasts FEN strings, timer updates, and game messages (e.g., resignations, draw offers, game over messages) to all connected clients.
+### Required Packages
 
-Threading:
+Install the necessary Python modules using pip:
 
-The server runs a timer thread that updates player clocks only when both players are present.
-
-The client uses a separate thread to receive network messages asynchronously.
-
-Integration with Stockfish
-Stockfish Engine:
-
-In spectator mode, the client launches Stockfish using the python-chess engine interface.
-
-The current board position is analyzed every second.
-
-The evaluation is visualized via a graphical evaluation bar (green indicates White advantage and red indicates Black advantage).
-
-Code Organization
-Client Code: Handles GUI, network communication, image loading, and full-screen functionality.
-
-Server Code: Manages game state, move validation, timers, and broadcasting messages.
-
-Common Libraries: Uses python-chess for chess logic and Pillow for image processing.
-
-Installation
-Prerequisites
-Python 3.x: Ensure you have Python 3 installed.
-
-Pip: Package installer for Python.
-
-Required Libraries: Install via pip:
-
-bash
-Copy
-Edit
+```bash
 pip install python-chess Pillow
-Stockfish:
-
-Download the Stockfish executable from Stockfish Downloads.
-
-Extract the executable.
-
-Place the executable in a known location (or add it to your system PATH).
-
-Update the engine path in the client code if needed (e.g., in chess.engine.SimpleEngine.popen_uci("stockfish")).
-
-Setup
-Clone or Download the Project Repository.
-
-Place Chess Piece Images:
-Ensure your chess piece images (named wP.png, wN.png, wB.png, etc.) are stored in the folder (e.g., C:\Users\thees\Pictures\Eko\Eko\eko\CN package\chesspng).
-
-Update Configurations:
-Verify the paths for images and Stockfish executable in the code.
-
-Usage
-Running the Server
-Open a terminal.
-
-Navigate to the project directory.
-
-Run the server script:
-
-bash
-Copy
-Edit
-python server.py
-The server will listen for incoming connections on the specified IP and port.
-
-Running the Client
-Open a terminal.
-
-Navigate to the project directory.
-
-Run the client script:
-
-bash
-Copy
-Edit
-python client.py
-A dialog will prompt you for your username and server IP.
-
-Choose your role (player or spectator).
-
-Players: The board orientation adjusts based on your color.
-
-Spectators: The evaluation bar appears on the left side.
-
-Use the "Full Screen" button to toggle full-screen mode.
-
-Future Improvements
-Enhanced Protocol: Implement a more robust protocol with message framing or JSON messages.
-
-Persistent Game History: Save game logs and moves for later analysis.
-
-Mobile Support: Adapt the GUI for mobile devices.
-
-Improved Evaluation: Display additional Stockfish analysis details (e.g., best move suggestions).
-
-License
-This project is open source. Feel free to modify and distribute according to your needs.
-
