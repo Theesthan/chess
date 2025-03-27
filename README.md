@@ -170,6 +170,6 @@ Ensure that all chess piece images (e.g., `wP.png`, `bK.png`) are stored in the 
 
 ## License
 
-This project is open source and available for modification and distribution under the [MIT License](LICENSE).
+Feel free to use this code
 
 ---
